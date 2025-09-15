@@ -86,7 +86,18 @@ const updateNotesController = async (req, res) => {
 const deleteNotesController = async (req, res) => {
     try {
 
-        
+        const id = req.params.id
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid object format please enter in valid ObjectId format" })
+        }
+
+        const note = await notesModel.findOneAndDelete(id)
+        if (!note) {
+            return res.status(400).json({ success: false, message: "Note not found" })
+        }
+
+        return res.status(200).json({ success: true, message: "Note delete successfully!!" })
+
     } catch (error) {
         console.log(error, "...Error catch block deleteNotesController");
         return res.status(500).json({ success: false, message: "Internal server Error" })

@@ -5,6 +5,6 @@ const notesRouter = require("express").Router()
 notesRouter.get('/', fetchAllNotesController)
 notesRouter.post('/create-notes', createNotesController)
 notesRouter.put('/:id', updateNotesController)
-notesRouter.post('/delete-notes', deleteNotesController)
+notesRouter.delete('/:id', deleteNotesController)
 
 module.exports = notesRouter

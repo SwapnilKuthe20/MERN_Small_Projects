@@ -32,7 +32,7 @@ function App() {
       <div className='flex justify-center items-center '>
 
 
-        <div className='w-1/2'>
+        <div className='w-96'>
 
           <label htmlFor="title"> Enter Title : </label>
           <div className='w-full text-amber-50 my-5' >
@@ -44,7 +44,7 @@ function App() {
             <textarea value={content} id='content' onChange={(e) => setContent(e.target.value)} placeholder="Content" rows={5} style={{ border: "1px solid white", padding: "7px", width: "100%" }}></textarea>
           </div>
 
-          <button onClick={handleAddNote} className='bg-fuchsia-400 text-black p-2.5 rounded cursor-pointer'>Add Note</button>
+          <button onClick={handleAddNote} className='bg-fuchsia-400 text-black p-2.5 rounded cursor-pointer block m-auto'>Add Note</button>
         </div>
 
         {/* {status === 'loading' && <p>Loading...</p>}
