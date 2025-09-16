@@ -25,10 +25,10 @@ export const fetchNotes = createAsyncThunk(
 
 export const createNotes = createAsyncThunk(
     'notes/createNotes',
-    async (_, { rejectWithValue }) => {
+    async (payload, { rejectWithValue }) => {
         try {
-            const res = await axios.get(API_URL)
-            return res.data
+            const res = await axios.post(`${API_URL}/create-notes`, payload)
+            return res.data.notes
 
         } catch (error) {
             console.log("Error occure in creating Notes...", error);
@@ -41,10 +41,12 @@ export const createNotes = createAsyncThunk(
 
 export const updateNotes = createAsyncThunk(
     'notes/updateNotes',
-    async (id, { rejectWithValue }) => {
+    async ({ id, updatedData }, { rejectWithValue }) => {
         try {
-            const res = await axios.get(API_URL)
-            return res.data
+            const res = await axios.put(`${API_URL}/${id}`, updatedData)
+            console.log(res.data, "...respo update");
+
+            return res.data.notes
 
         } catch (error) {
             console.log("Error occure in updating Notes...", error);
@@ -59,8 +61,11 @@ export const deleteNotes = createAsyncThunk(
     'notes/deleteNotes',
     async (id, { rejectWithValue }) => {
         try {
-            const res = await axios.get(API_URL)
-            return res.data
+            const res = await axios.delete(`${API_URL}/${id}`)
+
+            // console.log(res.data, "...res.data");
+
+            return res.data.note._id
 
         } catch (error) {
             console.log("Error occure in  deleting Notes...", error);
@@ -71,7 +76,7 @@ export const deleteNotes = createAsyncThunk(
 
 const notesSlice = createSlice({
     name: "notes",
-    initialState: { status: "idle", notes: {}, error: null },
+    initialState: { status: "idle", notes: [], error: null },
     extraReducers: (builder) => {
         builder
             // Fetch Notes
@@ -80,8 +85,11 @@ const notesSlice = createSlice({
                 state.error = null
             })
             .addCase(fetchNotes.fulfilled, (state, action) => {
+
+                // console.log(action.payload, "...action");
+
                 state.status = "succeeded"
-                state.notes = action.payload
+                state.notes = action.payload.notes
                 state.error = null
             })
             .addCase(fetchNotes.rejected, (state, action) => {
@@ -92,24 +100,41 @@ const notesSlice = createSlice({
 
             // Create Note
             .addCase(createNotes.fulfilled, (state, action) => {
+                // console.log({ ...state }, "...state create");
+                // console.log(action, "...action create");
+
+                state.status = "fulfilled"
                 state.notes.push(action.payload);
+                state.error = null
             })
 
             // Update Note
             .addCase(updateNotes.fulfilled, (state, action) => {
-                const index = state.notes.findIndex(note => note._id === action.payload._id);
-                if (index !== -1) {
-                    state.notes[index] = action.payload;
-                }
+                // console.log({...state}, "...state update");
+                // console.log(action, "...action update");
+
+                state.notes = state.notes.map(note =>
+                    note._id === action.payload._id ? action.payload : note
+                );
+
+                // const index = state.notes.findIndex(note => note._id === action.payload._id);
+                // if (index !== -1) {
+                //     state.status = "fulfilled"
+                //     state.notes[index] = action.payload;
+                //     state.error = null
+                // }
             })
 
             // Delete Note
             .addCase(deleteNotes.fulfilled, (state, action) => {
+
+                // console.log(action, "...action delete");
+
+                state.status = "fulfilled"
                 state.notes = state.notes.filter(note => note._id !== action.payload);
+                state.error = null
             });
     }
 })
-
-
 
 export const notesReducer = notesSlice.reducer

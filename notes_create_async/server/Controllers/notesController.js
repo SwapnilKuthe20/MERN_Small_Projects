@@ -9,7 +9,7 @@ const fetchAllNotesController = async (req, res) => {
 
         const fetchAllNotes = await notesModel.find()
 
-        console.log(fetchAllNotes, "...fetch all");
+        // console.log(fetchAllNotes, "...fetch all");
 
         return res.status(200).json({
             success: true,
@@ -46,10 +46,7 @@ const createNotesController = async (req, res) => {
         return res.status(201).json({
             success: true,
             message: "new Notes created successfully !!",
-            notes: {
-                title: newNotes.title,
-                content: newNotes.content
-            }
+            notes: newNotes
         })
 
     } catch (error) {
@@ -68,14 +65,16 @@ const updateNotesController = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid object format please enter in valid ObjectId format" })
         }
 
-        const notesById = await notesModel.findByIdAndUpdate(id)
+        // console.log(req.body, "...req.body");
+
+        const updatedNotes = await notesModel.findByIdAndUpdate(id, req.body, { new: true })
         // console.log(notesById, "...notesById");
 
-        if (!notesById) {
+        if (!updatedNotes) {
             return res.status(400).json({ success: false, message: "Notes not found" })
         }
 
-        return res.status(200).json({ success: true, message: "Notes foundSuccessFully", notesById })
+        return res.status(200).json({ success: true, message: "Notes foundSuccessFully", notes: updatedNotes })
 
     } catch (error) {
         console.log(error, "...Error catch block updateNotesController");
@@ -91,12 +90,12 @@ const deleteNotesController = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid object format please enter in valid ObjectId format" })
         }
 
-        const note = await notesModel.findOneAndDelete(id)
+        const note = await notesModel.findByIdAndDelete(id)
         if (!note) {
             return res.status(400).json({ success: false, message: "Note not found" })
         }
 
-        return res.status(200).json({ success: true, message: "Note delete successfully!!" })
+        return res.status(200).json({ success: true, message: "Note delete successfully!!", note: note })
 
     } catch (error) {
         console.log(error, "...Error catch block deleteNotesController");
