@@ -56,6 +56,23 @@ export const updateItem = createAsyncThunk(
     }
 )
 
+export const deleteItemApi = createAsyncThunk(
+    'item/delete',
+    async (id, { rejectWithValue }) => {
+        try {
+
+            const res = await axios.delete(`${Base_Url}/api/items/${id}`)
+            // console.log(res.data, "...res delete");
+
+            return res.data.item
+
+        } catch (error) {
+            console.log("Error in catch delete Api block..", error);
+            rejectWithValue("Error while deleting the Item")
+        }
+    }
+)
+
 const itemSlice = createSlice({
     name: "items",
     initialState: { status: "idle", items: [], error: null },
@@ -106,6 +123,24 @@ const itemSlice = createSlice({
             .addCase(updateItem.rejected, (state, action) => {
                 state.status = "rejected"
                 state.error = action.payload || "Something Went wrong !!"
+            })
+
+            // delete item : 
+            .addCase(deleteItemApi.pending, (state) => {
+                state.status = "loading"
+                state.error = null
+            })
+            .addCase(deleteItemApi.fulfilled, (state, action) => {
+                // console.log(state, "...state delete");
+                // console.log(action, "...action delete");
+
+                state.status = "fulfilled"
+                state.items = state.items.filter((item) => item._id !== action.payload._id)
+                state.error = null
+            })
+            .addCase(deleteItemApi.rejected, (state, action) => {
+                state.status = "rejected"
+                state.error = action.payload || "Something went wrong"
             })
     }
 })
